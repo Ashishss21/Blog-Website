@@ -1,18 +1,18 @@
 import Head from 'next/head'
+import Link from 'next/link'
 import Header from '../Components/Header'
 import Poster from '../Components/Poster'
-import Posts from '../Components/Posts'
 import { sanityClient, urlFor } from '../sanity'
 import { Post } from '../typings'
 
-interface Props{
-  posts:[Post];
+interface Props {
+  posts: [Post]
 }
 
-export default function Home({ posts}: Props) {
-  console.log(posts);
+export default function Home({ posts }: Props) {
+  console.log(posts)
   return (
-    <div className="mx-auto">
+    <div className="mx-auto max-w-7xl">
       <Head>
         <title>Blog Website</title>
         <link
@@ -28,7 +28,32 @@ export default function Home({ posts}: Props) {
       </Head>
       <Header />
       <Poster />
-      <Posts />
+
+      {/* Posts */}
+      <div className="max-w-7xl grid grid-cols-1 gap-3 p-2 sm:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3">
+        {posts.map((post) => {
+          return (
+            <Link key={post._id} href={`/post/${post.slug.current}`}>
+              <div className="group cursor-pointer rounded-lg border">
+                <img
+                  className="h-60 w-full object-cover transition-transform duration-200 ease-in-out group-hover:scale-110"
+                  src={urlFor(post.mainImage).url()!}
+                  alt="Post Head"
+                />
+                <div className="flex justify-between bg-white p-5">
+                  <p>{post.title}</p> <br/>
+                  <p>{post.description}</p>
+                </div>
+                {/* <img
+                className="h-12 w-12 rounded-full"
+                src={urlFor(post.author.image).url()!}
+                alt="Author Photo"
+              /> */}
+              </div>
+            </Link>
+          )
+        })}
+      </div>
     </div>
   )
 }
@@ -37,20 +62,20 @@ export const getServerSideProps = async () => {
   const query = `*[_type == "post"]{
     _id,
     title,
-    author =>{
-      name,
-      image
-    },
     description,
     mainImage,
-    slug
+    slug,
+    author=>{
+      name,
+      image,
+    },
   }`
 
-  const posts = await sanityClient.fetch(query);
+  const posts = await sanityClient.fetch(query)
 
-  return{
-    props:{
+  return {
+    props: {
       posts,
-    }
+    },
   }
 }
