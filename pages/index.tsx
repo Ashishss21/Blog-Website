@@ -1,6 +1,8 @@
 import Head from 'next/head';
 import Header from '../Components/Header';
 import Poster from '../Components/Poster';
+import Posts from '../Components/Posts';
+import { sanityClient, urlFor } from '../sanity';
 
 export default function Home() {
   return (
@@ -17,6 +19,12 @@ export default function Home() {
       </Head>
       <Header />
       <Poster/>
+      <Posts/>
     </div>
   )
+}
+
+
+export const getServerSideProps = async () =>{
+  const query = `*[_type == "post]{}`;
 }
